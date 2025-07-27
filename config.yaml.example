@@ -1,0 +1,23 @@
+server:
+  host: "0.0.0.0"
+  port: 8080
+  https: true
+  cert_file: "./certs/domain.chain.pem"
+  key_file: "./certs/domain.key.pem"
+  base_url: "https://domain:8080"
+
+extensions:
+  directory: "./data/extensions"
+
+assets:
+  directory: "./data/assets"
+  cache_time: 3600
+
+database:
+  path: "./littlevsx.db"
+  auto_migrate: true
+  log_queries: false
+
+logging:
+  level: "info"
+  format: "json"

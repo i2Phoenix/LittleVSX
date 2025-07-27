@@ -1,0 +1,40 @@
+# Binary files
+littlevsx
+*.exe
+*.dll
+*.so
+*.dylib
+download.sh
+
+# Database
+*.db
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Go files
+*.test
+*.out
+go.work
+
+# Extensions data
+data/
+
+# Certificates
+certs/
+
+# Configuration
+config.yaml
