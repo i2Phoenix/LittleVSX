@@ -5,6 +5,7 @@ littlevsx
 *.so
 *.dylib
 download.sh
+update_db.py
 
 # Database
 *.db

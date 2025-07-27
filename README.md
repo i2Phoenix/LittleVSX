@@ -2,7 +2,6 @@
 
 > 🧩 Self-hosted Visual Studio Code Extension Marketplace for offline or restricted environments.
 
-[![Go Report Card](https://goreportcard.com/badge/littlevsx)](https://goreportcard.com/report/littlevsx)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 ---
@@ -35,7 +34,7 @@ It allows extensions to be hosted and served locally, with automatic asset rewri
 1. Clone the repository:
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/i2Phoenix/LittleVSX
 cd littlevsx
 ```
 
