@@ -33,20 +33,26 @@ func init() {
 func runServe() error {
 	config := config.GetConfig()
 
-	extManager, err := initializeServerComponents(config)
+	extManager, err := extensions.New()
 	if err != nil {
-		return err
+		return fmt.Errorf("error initializing extension manager: %w", err)
 	}
 	defer extManager.Close()
 
-	srv := createServer(extManager, config)
+	var srv *server.Server
+	if config.UseHTTPS {
+		srv = server.NewWithHTTPS(extManager, config.CertFile, config.KeyFile, config.BaseURL)
+	} else {
+		srv = server.New(extManager, config.BaseURL)
+	}
+
 	addr := fmt.Sprintf("%s:%d", config.Host, config.Port)
 
-	protocol := "http"
 	if config.UseHTTPS {
-		protocol = "https"
+		fmt.Printf("Server started. Marketplace is available at: %s://%s\n", "https", addr)
+	} else {
+		fmt.Printf("Server started. Marketplace is available at: %s://%s\n", "http", addr)
 	}
-	fmt.Printf("Server started. API is available at: %s://%s\n", protocol, addr)
 	fmt.Println("Press Ctrl+C to stop the server")
 
 	sigChan := make(chan os.Signal, 1)
@@ -78,20 +84,4 @@ func runServe() error {
 
 	fmt.Println("Server stopped successfully")
 	return nil
-}
-
-func initializeServerComponents(config config.Config) (*extensions.Manager, error) {
-	extManager, err := extensions.New()
-	if err != nil {
-		return nil, err
-	}
-
-	return extManager, nil
-}
-
-func createServer(extManager *extensions.Manager, config config.Config) *server.Server {
-	if config.UseHTTPS {
-		return server.NewWithHTTPS(extManager, config.CertFile, config.KeyFile, config.BaseURL)
-	}
-	return server.New(extManager, config.BaseURL)
 }
