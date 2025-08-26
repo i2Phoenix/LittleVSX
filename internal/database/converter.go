@@ -2,6 +2,7 @@ package database
 
 import (
 	"encoding/json"
+	"time"
 
 	"littlevsx/internal/models"
 )
@@ -11,6 +12,7 @@ func ToDBExtension(ext *models.Extension) *ExtensionDB {
 	categoriesJSON, _ := json.Marshal(ext.Categories)
 	tagsJSON, _ := json.Marshal(ext.Tags)
 
+	now := time.Now()
 	return &ExtensionDB{
 		ID:               ext.ID,
 		Name:             ext.Name,
@@ -29,6 +31,8 @@ func ToDBExtension(ext *models.Extension) *ExtensionDB {
 		FileSize:         ext.FileSize,
 		LastUpdated:      ext.LastUpdated,
 		FilePath:         ext.FilePath,
+		CreatedAt:        now,
+		UpdatedAt:        now,
 		Verified:         ext.Verified,
 		AverageRating:    ext.AverageRating,
 		ReviewCount:      ext.ReviewCount,

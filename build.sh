@@ -49,7 +49,7 @@ for OS in "${PLATFORMS[@]}"; do
 
         export GOOS="$OS"
         export GOARCH="$ARCH"
-        export CGO_ENABLED=1
+        export CGO_ENABLED=0
 
         if go build -o "$OUTPUT_PATH" -ldflags="-s -w" ./main.go; then
             print_status "✓ Successfully built: $OUTPUT_NAME"
