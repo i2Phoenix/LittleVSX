@@ -13,6 +13,7 @@ import (
 	"time"
 )
 
+// ExtensionInfo represents extension information from any marketplace
 type ExtensionInfo struct {
 	ID          string `json:"id"`
 	Name        string `json:"name"`
@@ -24,19 +25,29 @@ type ExtensionInfo struct {
 	FileSize    int64  `json:"fileSize"`
 }
 
-type Marketplace struct {
+// DownloadResult represents the result of a download operation
+type DownloadResult struct {
+	FilePath      string
+	WasDownloaded bool
+}
+
+type MicrosoftMarketplace struct {
 	client *http.Client
 }
 
-func New() *Marketplace {
-	return &Marketplace{
+func NewMicrosoft() *MicrosoftMarketplace {
+	return &MicrosoftMarketplace{
 		client: &http.Client{
 			Timeout: 30 * time.Second,
 		},
 	}
 }
 
-func (m *Marketplace) GetExtensionInfo(marketplaceURL string) (*ExtensionInfo, error) {
+func (m *MicrosoftMarketplace) GetName() string {
+	return "Microsoft Marketplace"
+}
+
+func (m *MicrosoftMarketplace) GetExtensionInfo(marketplaceURL string) (*ExtensionInfo, error) {
 	cleanURL := strings.ReplaceAll(marketplaceURL, "\\", "")
 	parsedURL, err := url.Parse(cleanURL)
 	if err != nil {
@@ -56,16 +67,11 @@ func (m *Marketplace) GetExtensionInfo(marketplaceURL string) (*ExtensionInfo, e
 	return info, nil
 }
 
-func (m *Marketplace) GetExtensionInfoByID(extensionID string) (*ExtensionInfo, error) {
+func (m *MicrosoftMarketplace) GetExtensionInfoByID(extensionID string) (*ExtensionInfo, error) {
 	return m.fetchExtensionInfo(extensionID)
 }
 
-type DownloadResult struct {
-	FilePath      string
-	WasDownloaded bool
-}
-
-func (m *Marketplace) DownloadExtension(info *ExtensionInfo, targetDir string) (*DownloadResult, error) {
+func (m *MicrosoftMarketplace) DownloadExtension(info *ExtensionInfo, targetDir string) (*DownloadResult, error) {
 	if err := os.MkdirAll(targetDir, 0755); err != nil {
 		return nil, fmt.Errorf("failed to create directory: %w", err)
 	}
@@ -84,7 +90,7 @@ func (m *Marketplace) DownloadExtension(info *ExtensionInfo, targetDir string) (
 	return &DownloadResult{FilePath: filePath, WasDownloaded: true}, nil
 }
 
-func (m *Marketplace) extractExtensionID(parsedURL *url.URL) (string, error) {
+func (m *MicrosoftMarketplace) extractExtensionID(parsedURL *url.URL) (string, error) {
 	if itemName := parsedURL.Query().Get("itemName"); itemName != "" {
 		return itemName, nil
 	}
@@ -111,7 +117,7 @@ func (m *Marketplace) extractExtensionID(parsedURL *url.URL) (string, error) {
 	return "", fmt.Errorf("could not extract extension ID from URL: %s", parsedURL.String())
 }
 
-func (m *Marketplace) fetchExtensionInfo(extensionID string) (*ExtensionInfo, error) {
+func (m *MicrosoftMarketplace) fetchExtensionInfo(extensionID string) (*ExtensionInfo, error) {
 	apiURL := "https://marketplace.visualstudio.com/_apis/public/gallery/extensionquery"
 
 	requestBody := map[string]interface{}{
@@ -219,7 +225,7 @@ func (m *Marketplace) fetchExtensionInfo(extensionID string) (*ExtensionInfo, er
 	}, nil
 }
 
-func (m *Marketplace) downloadFile(downloadURL, filePath string) error {
+func (m *MicrosoftMarketplace) downloadFile(downloadURL, filePath string) error {
 	resp, err := m.client.Get(downloadURL)
 	if err != nil {
 		return fmt.Errorf("request error: %w", err)

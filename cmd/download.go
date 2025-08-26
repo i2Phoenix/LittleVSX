@@ -11,10 +11,23 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var (
+	marketplaceType string
+)
+
 var downloadCmd = &cobra.Command{
-	Use:   "download [EXTENSION_ID]",
-	Short: "Downloads an extension from Microsoft Marketplace",
-	Args:  cobra.ExactArgs(1),
+	Use:   "download --type MARKETPLACE_TYPE EXTENSION_ID",
+	Short: "Downloads an extension from specified marketplace",
+	Long: `Downloads an extension from the specified marketplace.
+	
+Supported marketplaces:
+- microsoft: Microsoft Marketplace
+- open-vsx: Open VSX Registry (open-vsx.org)
+
+Examples:
+  littlevsx download --type microsoft ms-python.python
+  littlevsx download --type open-vsx jeanp413.open-remote-ssh`,
+	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cmd.SilenceUsage = true
 		return runDownload(args[0])
@@ -22,10 +35,16 @@ var downloadCmd = &cobra.Command{
 }
 
 func init() {
+	downloadCmd.Flags().StringVarP(&marketplaceType, "type", "t", "", "Marketplace type: microsoft, open-vsx (required)")
+	downloadCmd.MarkFlagRequired("type")
 	rootCmd.AddCommand(downloadCmd)
 }
 
 func runDownload(extensionID string) error {
+	if marketplaceType == "" {
+		return fmt.Errorf("marketplace type is required, use --type flag")
+	}
+
 	config := config.GetConfig()
 
 	extManager, err := extensions.New()
@@ -34,9 +53,17 @@ func runDownload(extensionID string) error {
 	}
 	defer extManager.Close()
 
-	mp := marketplace.New()
+	factory := marketplace.NewFactory()
+	marketplaceTypeEnum := marketplace.MarketplaceType(marketplaceType)
 
+	mp, err := factory.CreateByType(marketplaceTypeEnum)
+	if err != nil {
+		return fmt.Errorf("error creating marketplace provider: %w", err)
+	}
+
+	fmt.Printf("Using marketplace: %s\n", mp.GetName())
 	fmt.Println("Getting extension information...")
+
 	info, err := mp.GetExtensionInfoByID(extensionID)
 	if err != nil {
 		return fmt.Errorf("error getting extension information: %w", err)
