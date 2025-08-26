@@ -24,10 +24,11 @@ It allows extensions to be hosted and served locally, with automatic asset rewri
 ## ✨ Features
 
 - 📦 **Compatible API** for VS Code & VSCodium
-- 🔁 **Automatic extension fetching** from Microsoft Marketplace
+- 🔁 **Automatic extension fetching** from Microsoft Marketplace and Open VSX Registry
 - 🖼️ **Smart asset rewriting** (README images, CSS, JS → local links)
 - 🔐 **REST API with HTTPS and CORS**
 - 🗃️ **SQLite-based database with auto-migration**
+- 🌐 **Multi-marketplace support** (Microsoft Marketplace, Open VSX Registry)
 
 ## 🚀 Getting Started
 
@@ -113,7 +114,10 @@ logging:
 littlevsx serve
 
 # Download an extension from Microsoft Marketplace
-littlevsx download ms-python.python
+littlevsx download --type microsoft ms-python.python
+
+# Download an extension from Open VSX Registry
+littlevsx download --type open-vsx jeanp413.open-remote-ssh
 
 # Remove an extension
 littlevsx delete ms-python.python
@@ -121,16 +125,36 @@ littlevsx delete ms-python.python
 
 ## 📥 Downloading Extensions
 
+LittleVSX supports downloading extensions from multiple marketplaces:
+
+### Microsoft Marketplace
+
 1. Visit https://marketplace.visualstudio.com/
 2. Find the desired extension
 3. Copy the ID from the URL (e.g., `ms-python.python`)
 4. Run:
 
 ```bash
-littlevsx download ms-python.python
+littlevsx download --type microsoft ms-python.python
 ```
 
-Once downloaded, the extension becomes available via API.
+### Open VSX Registry
+
+1. Visit https://open-vsx.org/
+2. Find the desired extension
+3. Copy the ID from the URL (e.g., `jeanp413.open-remote-ssh`)
+4. Run:
+
+```bash
+littlevsx download --type open-vsx jeanp413.open-remote-ssh
+```
+
+### Marketplace Types
+
+- **`microsoft`**: Official Microsoft Visual Studio Marketplace
+- **`open-vsx`**: Open VSX Registry (open-vsx.org) - open-source alternative
+
+Once downloaded, extensions become available via API regardless of their source marketplace.
 
 Asset processing:
 
@@ -175,6 +199,8 @@ Replace `https://your-littlevsx-server:8080` with the actual URL defined in your
 - Internal developer environments
 - Air-gapped networks (government, military, industrial)
 - Custom curated extension marketplaces
+- Organizations preferring open-source alternatives to Microsoft Marketplace
+- Multi-marketplace extension aggregation and curation
 
 ## 📄 License
 
